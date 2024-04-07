@@ -35,7 +35,7 @@ app.get('/api/employees', async (req, res, next) => {
         const SQL = `
             SELECT * from employees
         `;
-        const response = client.query(SQL);
+        const response = await client.query(SQL);
         res.send(response.rows);
     } catch (error) {
         next(error);
@@ -51,7 +51,7 @@ app.post('/api/employees', async (req, res, next) => {
             VALUES($1, $2)
             RETURNING *
         `;
-        const response = client.query(SQL, [req.body.name, req.body.department_id]);
+        const response = await client.query(SQL, [req.body.name, req.body.department_id]);
         res.send(response.rows[0]);
     } catch (error) {
         next(error);
