@@ -14,6 +14,70 @@ app.use(require('morgan')('dev'));
 
 //crud/express routes
 
+//get departments
+
+app.get('/api/departments', async (req, res, next)=> {
+    try {
+        const SQL = `
+            SELECT * from departments
+        `;
+        const response = await client.query(SQL);
+        res.send(response.rows);
+    } catch (ex) {
+        next(ex);
+    }
+});
+
+//get employees
+
+app.get('/api/employees', async (req, res, next) => {
+    try {
+        const SQL = `
+            SELECT * from employees
+        `;
+        const response = client.query(SQL);
+        res.send(response.rows);
+    } catch (error) {
+        next(error);
+    }
+});
+
+//add employee
+
+app.post('/api/employees', async (req, res, next) => {
+    try {
+        const SQL = `
+            INSERT INTO employees(name, department_id)
+            VALUES($1, $2)
+            RETURNING *
+        `;
+        const response = client.query(SQL, [req.body.name, req.body.department_id]);
+        res.send(response.rows[0]);
+    } catch (error) {
+        next(error);
+    }
+});
+
+//update employee
+app.put('/api/employees', async (req, res, next) => {
+    try {
+        const SQL = `
+            UPDATE employees
+            SEST name = $1, department_id = $2, updated_at= now()
+            WHERE id = $3 RETURNING *
+        `;
+        const response = await client.query(SQL, [req.body.name, req.body.department_id, req.params.id]);
+        res.send(response.rows[0]);
+    } catch (error) {
+        next(error)
+    }
+});
+
+//error route
+app.use((error, req, res, next) => {
+    res.status(res.status || 500).send({ error: error });
+});
+
 //database connection
 
 const init = async () => {
