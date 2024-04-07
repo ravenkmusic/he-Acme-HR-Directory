@@ -63,13 +63,27 @@ app.put('/api/employees', async (req, res, next) => {
     try {
         const SQL = `
             UPDATE employees
-            SEST name = $1, department_id = $2, updated_at= now()
+            SET name = $1, department_id = $2, updated_at= now()
             WHERE id = $3 RETURNING *
         `;
         const response = await client.query(SQL, [req.body.name, req.body.department_id, req.params.id]);
         res.send(response.rows[0]);
     } catch (error) {
         next(error)
+    }
+});
+
+//delete employee
+app.delete('/api/employees/:id', async (req, res, next) => {
+    try {
+        const SQL = `
+            DELETE from employees
+            where id = $1
+        `;
+        const response = await client.query(SQL, [req.params.id]);
+        res.sendStatus(204);
+    } catch (error) {
+        next(error);
     }
 });
 
